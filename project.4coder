@@ -1,0 +1,55 @@
+version(1);
+
+project_name = "InfinityC";
+
+patterns = {
+	"makefile",
+	"*.md",
+	"*.c",
+	"*.h",
+	"*.4coder",
+};
+
+blacklist_patterns = {
+	".*"
+};
+
+load_paths = {
+	{ { {".", .recursive = true, .relative = true } }, .os = "win" },
+	{ { {".", .relative = true, .recursive = true } }, .os = "linux" },
+};
+
+
+command_list = {
+	{ 
+		.name = "build",
+		.out = "*building*",
+		.footer_panel = true, .save_dirty_files = false, .cursor_at_end = true,
+		.cmd = {
+          {"make windows", .os = "win"},
+          {"make linux", .os = "linux"},
+		},
+	},
+	{
+		.name = "clean",
+		.out = "*cleaning*",
+		.footer_panel = true, .save_dirty_files = false, .cursor_at_end = true,
+		.cmd = {
+			{"make windows", .os = "win"},
+			{"make linux", .os = "linux"},
+		},
+	},
+	{
+		.name = "push",
+		.out = "*pushing*",
+		.footer_panel = true, .save_dirty_files = false, .cursor_at_end = true,
+		.cmd = {
+			{"make push", .os = "win"},
+			{"make push", .os = "linux"},
+		},
+	}
+};
+
+fkey_command[1] = "build";
+fkey_command[2] = "push";
+fkey_command[3] = "clean";
