@@ -4,10 +4,10 @@
 #define PATTERNS_H
 
 
-struct PatternBounds {
+typedef struct module_bounds {
     void* first;
     void* last;
-}
+} PatternBounds;
 
 
 void* FindPattern(PatternBounds bounds, const char* pattern);

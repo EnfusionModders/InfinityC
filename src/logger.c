@@ -8,7 +8,7 @@ void Println(ELogType type, const char* format, ...)
 #if !defined(DEBUG)
     if(type == LT_DEBUG) return; // no debug logs when compiled without debug
 #endif
-    printf("INFINITY     ");
+    printf("INFINITY   ");
     switch(type)
     {
         case LT_INFO:
