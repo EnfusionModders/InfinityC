@@ -21,26 +21,4 @@ typedef struct infinity_core {
 
 
 
-/*
-Example plugin:
-
-void TestFunction(void* pArgs, void* pResult)
-{
-
-printf("wow!");
-
-}
-
-extern "C" OnPluginLoad(InfinityCore* pCore)
-{
-  
-ScriptClass* pClass = pCore->registerClass("ExampleClass");
-pCore->registerFunction(pClass, "ExampleFunction", &TestFunction);
-
-}
-
-
-*/
-
-
 #endif //INFINITYPLUGIN_H
