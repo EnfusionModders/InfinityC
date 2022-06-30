@@ -36,7 +36,7 @@ EXPORT void OnPluginLoad(InfinityCore* pCore)
     g_pCore = pCore;
     ScriptClass* pClass = pCore->registerClass("Example");
     pCore->registerFunction(pClass, "Test", &Test);
-       g_pCore->printToLogf(LVL_INFO, "Example plugin loaded.");
+    g_pCore->printToLogf(LVL_INFO, "Example plugin loaded.");
 }
 ```
 
