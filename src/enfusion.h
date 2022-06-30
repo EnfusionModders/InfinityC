@@ -3,12 +3,29 @@
 #ifndef ENFUSION_H
 #define ENFUSION_H
 
+#include <stdarg.h>
+
 typedef enum {ET_WORKBENCH, ET_SERVER, ET_OTHER} EEngineType;
+typedef enum {
+    // I only added the ones I care about xd
+    ELT_DEFAULT = 1,
+    ELT_ENGINE = 2,
+    ELT_SCRIPT = 9,
+    ELT_INIT = 13,
+} EEngineLogType;
+typedef enum {
+    ELL_INFO = 8,
+    ELL_WARN = 0x10,
+    ELL_ERROR = 0x20,
+    ELL_FATAL = 0x40,
+} EEngineLogLevel;
+
 
 // enfusion function definitions
-typedef void(__fastcall* TEnfusionScriptFunction)(void* pArgs, void* pResult);
+typedef void*(__fastcall* TEnfusionScriptFunction)(void* pArgs, void* pResult);
 typedef void*(__fastcall* TEnfusionRegisterClass)(void* pScriptCtx, const char* className);
 typedef void*(__fastcall* TEnfusionRegisterClassFunction)(void* pScriptCtx, void* pClassInst, const char* functionName, TEnfusionScriptFunction* scriptFunction, unsigned int zero, char one);
+typedef void(__fastcall* TEnfusionLogPrintf)(unsigned int message_level, long long sender_type, const char *format, va_list args);
 
 // registrator "class" structures and types
 typedef struct enfusion_plugin_registrator_function_table_entry FunctionTableEntry;
@@ -60,5 +77,7 @@ int WaitForGlobalRegistratorTable();
 EnfusionRegistrator* GetLastRegistratorEntry();
 int InsertChildRegistrator(EnfusionRegistrator* parent, EnfusionRegistrator* child);
 FunctionTableEntry* InsertFunction(EnfusionRegistrator* registrator, const char* functionName, TEnfusionScriptFunction function);
+int VEnfusionPrint(EEngineLogType type, EEngineLogLevel level, const char* format, va_list args);
+int EnfusionPrint(EEngineLogType type, EEngineLogLevel level, const char* format, ...);
 
 #endif //ENFUSION_H

@@ -3,35 +3,42 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+
+#include "enfusion.h"
+
 void Println(ELogType type, const char* format, ...)
 {
-#if !defined(DEBUG)
-    if(type == LT_DEBUG) return; // no debug logs when compiled without debug
-#endif
-    printf("INFINITY   ");
+    EEngineLogLevel elevel = ELL_INFO;
+    const char* typedetails = "(?)";
     switch(type)
     {
         case LT_INFO:
-        printf("   ");
+        elevel = ELL_INFO;
+        typedetails = ("   ");
         break;
         case LT_WARN:
-        printf("(W)");
+        elevel = ELL_WARN;
+        typedetails = ("(W)");
         break;
         case LT_ERROR:
-        printf("(E)");
+        elevel = ELL_ERROR;
+        typedetails = ("(E)");
         break;
-        case LT_DEBUG:
-        printf("(D)");
-        break;
-        default:
-        printf("(?)");
+        case LT_FATAL:
+        elevel = ELL_FATAL;
+        typedetails = ("(F)");
         break;
     }
-    printf(": ");
-    // temporary until we've figured out how to print to the standard logger in enfusion
+    
     va_list lst;
     va_start( lst, format );
-    vprintf( format, lst );
+    if(!VEnfusionPrint(ELT_DEFAULT, elevel, format, lst))
+    {
+        printf("INFINITY   ");
+        printf(typedetails);
+        printf(": ");
+        vprintf( format, lst );
+        printf("\n");
+    }
     va_end( lst );
-    printf("\n");
 }

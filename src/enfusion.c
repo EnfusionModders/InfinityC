@@ -1,6 +1,7 @@
 #include "enfusion.h"
 
 #include <stdint.h>
+#include <stdarg.h>
 
 #if defined(_WIN64)
 #include <Windows.h>
@@ -18,6 +19,7 @@ const char* TARGET_MODULE_NAME = "ModuleGame";
 const char* PATTERN_SCRIPT_TABLE_HEAD = "48 8B 1D ? ? ? ? 48 8B F2 4C 8B F1";
 const char* PATTERN_REGISTER_CLASS = "48 83 EC 38 4C 8B C2 41 B1 02";
 const char* PATTERN_REGISTER_CLASS_FUNCTION = "48 89 5C 24 ? 57 48 83 EC 30 0F B6 44 24 ? 48 8B D9";
+const char* PATTERN_PRINTF_TO_LOG = "48 8B C4 4C 89 48 20 4C 89 40 18 41 54 41 56 41 57 48 81 EC ? ? ? ? 3B 0D ? ? ? ? 4D 8B F1 44 8B FA 44 8B E1 0F 82";
 #elif
 const char* PATTERN_SCRIPT_TABLE_HEAD = "00";
 const char* PATTERN_REGISTER_CLASS = "00";
@@ -28,6 +30,7 @@ EnfusionRegistrator** EnfusionGlobalRegistratorTable;
 const char* EnfusionStringModuleGame = NULL;
 TEnfusionRegisterClass RegisterEnfusionClass = NULL;
 TEnfusionRegisterClassFunction RegisterEnfusionClassFunction = NULL;
+TEnfusionLogPrintf PrintToEnfusionf = NULL;
 
 EEngineType GetEnfusionEngineType()
 {
@@ -68,7 +71,6 @@ PatternBounds getEngineBounds()
 
 int InitEnfusion()
 {
-    Println(LT_DEBUG, "Enfusion init started...");
     // find patterns for 
     PatternBounds searchRange = getEngineBounds();
     if(!searchRange.first || !searchRange.last)
@@ -85,8 +87,6 @@ int InitEnfusion()
     }
     uint32_t rel = *(uint32_t*)((uint64_t)addr+3); // pattern start is offset from 3 to the rel access
     EnfusionGlobalRegistratorTable = (void*)((uint64_t)addr + 7 + rel); // 3 offset + 4 size of int32
-    Println(LT_DEBUG, "Found Table Head @ %p from %p / %d",EnfusionGlobalRegistratorTable, addr, rel);
-    
     
     RegisterEnfusionClass = FindPattern(searchRange, PATTERN_REGISTER_CLASS);
     if(!RegisterEnfusionClass)
@@ -102,7 +102,31 @@ int InitEnfusion()
         return 0;
     }
     
-    Println(LT_DEBUG, "Enfusion init success.");
+    PrintToEnfusionf = FindPattern(searchRange, PATTERN_PRINTF_TO_LOG);
+    if(!PrintToEnfusionf)
+    {
+        Println(LT_ERROR, "Failed to find log print routine.");
+        return 0;
+    }
+    
+    return 1;
+}
+
+// -----------------------------------------------------------------------------
+// engine logging
+int VEnfusionPrint(EEngineLogType type, EEngineLogLevel level, const char* format, va_list args)
+{
+    if(!PrintToEnfusionf) return 0;
+    PrintToEnfusionf(level, type, format, args);
+    return 1;
+}
+int EnfusionPrint(EEngineLogType type, EEngineLogLevel level, const char* format, ...)
+{
+    if(!PrintToEnfusionf) return 0;
+    va_list args;
+    va_start( args, format );
+    PrintToEnfusionf(level, type, format, args);
+    va_end( args );
     return 1;
 }
 
@@ -199,7 +223,6 @@ void* registerFunction(EnfusionRegistrator* registrator, void* a2)
     if ((*(uint32_t*)((uint64_t)a2 + 24) & 0x10) == 0)
 		return (void*)1;
     
-    Println(LT_DEBUG, "Base registrator called for %s.", name);
     
     void* pContext = *(void**)((uint64_t)a2 + 16);
     registrator->scriptClass = RegisterEnfusionClass(pContext, name);

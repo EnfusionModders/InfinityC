@@ -15,7 +15,6 @@ void InfinityMain() {
     if(etype == ET_OTHER) return; // do not load infinity in unknown apps
     
     Println(LT_INFO, "Infinity loading...");
-    Println(LT_DEBUG, "Engine type: %d", etype);
     
     // read patterns / pull static offsets from enfusion
     if(!InitEnfusion())

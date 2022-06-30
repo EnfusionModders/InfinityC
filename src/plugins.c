@@ -13,6 +13,7 @@
 typedef void(__fastcall* TPluginEnumCallback)(const char* fullPath);
 typedef void(__fastcall* TOnPluginLoad)(InfinityCore* pCore);
 
+void printToLogf(LogLevel level, const char* format, ...);
 void* getExport(const char* library, const char* function);
 void enumPluginFiles(TPluginEnumCallback onPluginFound);
 void onPluginFound(const char* libraryPath);
@@ -44,6 +45,28 @@ void initCore()
 {
     g_Core.registerClass = pluginRegisterClass;
     g_Core.registerFunction = pluginRegisterClassFunction;
+    g_Core.printToLogf = printToLogf;
+}
+
+void printToLogf(LogLevel level, const char* format, ...)
+{
+    EEngineLogLevel lvl = ELL_INFO;
+    switch(level)
+    {
+        case LVL_WARN:
+        lvl = ELL_WARN;
+        break;
+        case LVL_ERROR:
+        lvl = ELL_ERROR;
+        break;
+        case LVL_FATAL:
+        lvl = ELL_FATAL;
+        break;
+    }
+    va_list lst;
+    va_start( lst, format );
+    VEnfusionPrint(ELT_SCRIPT, lvl, format, lst);
+    va_end( lst );
 }
 
 ScriptClass* pluginRegisterClass(const char* className)
@@ -109,7 +132,7 @@ void enumPluginFiles(TPluginEnumCallback onPluginFound)
     
     sprintf(sPath, "%s\\*.*", sDir);
     
-    Println(LT_DEBUG, "Looking for plugins in %s.", sPath);
+    Println(LT_INFO, "Looking for plugins in %s.", sPath);
     
     if((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE)
     {
@@ -130,7 +153,7 @@ void enumPluginFiles(TPluginEnumCallback onPluginFound)
             //Is the entity a File or Folder?
             if(!(fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
             {
-                Println(LT_DEBUG, "Found plugin: %s\n", sPath);
+                Println(LT_INFO, "Found plugin: %s\n", sPath);
                 onPluginFound(sPath);
             }
         }

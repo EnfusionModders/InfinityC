@@ -3,7 +3,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-typedef enum {LT_INFO, LT_WARN, LT_ERROR, LT_DEBUG} ELogType;
+typedef enum {LT_INFO, LT_WARN, LT_ERROR, LT_FATAL} ELogType;
 
 void Println(ELogType type, const char* format, ...);
 
