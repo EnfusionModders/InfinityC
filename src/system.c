@@ -159,7 +159,7 @@ void* GetExport(const char* library, const char* function)
 #if defined(_WIN64)
     HMODULE hLib = LoadLibraryA(library);
     if(!hLib) return 0;
-    return GetProcAddress(hLib, "OnPluginLoad");
+    return GetProcAddress(hLib, function);
 #elif
     void* hLib = dlopen(library, RTLD_NOW | RTLD_NODELETE);
     if(!hLib) return 0;
