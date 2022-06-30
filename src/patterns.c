@@ -1,3 +1,4 @@
+/* Author: Kegan 'Lystic' Hollern */
 #include "patterns.h"
 
 #include <stdlib.h>

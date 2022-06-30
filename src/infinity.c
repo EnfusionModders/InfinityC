@@ -22,6 +22,7 @@ void InfinityMain() {
         Println(LT_ERROR, "Failed to initialize infinity!");
         return;
     }
+    
     // wait for everyhting to get ready
     if(!WaitForGlobalRegistratorTable())
     {

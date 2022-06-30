@@ -1,4 +1,4 @@
-/* date = June 29th 2022 2:07 pm */
+/* Author: Kegan 'Lystic' Hollern */
 
 #ifndef PATTERNS_H
 #define PATTERNS_H
