@@ -27,16 +27,16 @@ InfinityCore* g_pCore = 0;
 
 void* Test(void* args, void* result)
 {
-	g_pCore->printToLogf(LVL_INFO, "THIS CAME FROM NATIVE CODE");
+	g_pCore->Print(LVL_INFO, "THIS CAME FROM NATIVE CODE");
 	return result;
 }
 
 EXPORT void OnPluginLoad(InfinityCore* pCore)
 {
     g_pCore = pCore;
-    ScriptClass* pClass = pCore->registerClass("Example");
-    pCore->registerFunction(pClass, "Test", &Test);
-    g_pCore->printToLogf(LVL_INFO, "Example plugin loaded.");
+    ScriptClass* pClass = pCore->RegisterClass("Example");
+    pCore->RegisterFunction(pClass, "Test", &Test);
+    g_pCore->Print(LVL_INFO, "Example plugin loaded.");
 }
 ```
 
