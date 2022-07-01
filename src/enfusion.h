@@ -4,13 +4,15 @@
 #define ENFUSION_H
 
 #include <stdarg.h>
+
 #include "logger.h"
+#include "conventions.h"
 
 typedef enum {ET_WORKBENCH, ET_SERVER, ET_OTHER} EEngineType;
 
 // ---------------------------------------------------------------------------
 // engine logging
-typedef void(__fastcall* TEnfusionLogPrintf)(unsigned int message_level, long long sender_type, const char *format, va_list args);
+typedef void(fastcall* TEnfusionLogPrintf)(unsigned int message_level, long long sender_type, const char *format, va_list args);
 
 typedef enum {
     // I only added the ones I care about xd
@@ -32,20 +34,20 @@ int VEnfusionPrint(EEngineLogType type, EEngineLogLevel level, const char* forma
 // --------------------------------------------------------------------------
 // proto script function definition
 
-typedef void*(__fastcall* TEnfusionScriptFunction)(void* pArgs, void* pResult);
+typedef void*(fastcall* TEnfusionScriptFunction)(void* pArgs, void* pResult);
 
 // ---------------------------------------------------------------------------
 // engine script registrator
 
 
-typedef void*(__fastcall* TEnfusionRegisterClass)(void* pScriptCtx, const char* className);
-typedef void*(__fastcall* TEnfusionRegisterClassFunction)(void* pScriptCtx, void* pClassInst, const char* functionName, TEnfusionScriptFunction* scriptFunction, unsigned int zero, char one);
+typedef void*(fastcall* TEnfusionRegisterClass)(void* pScriptCtx, const char* className);
+typedef void*(fastcall* TEnfusionRegisterClassFunction)(void* pScriptCtx, void* pClassInst, const char* functionName, TEnfusionScriptFunction* scriptFunction, unsigned int zero, char one);
 
 typedef struct enfusion_plugin_registrator_function_table_entry FunctionTableEntry;
 typedef struct enfusion_registrator EnfusionRegistrator;
 typedef struct enfusion_registrator_vtable EnfusionRegistratorVTable;
-typedef void*(__fastcall* TEnfusionRegistratorFunction)(EnfusionRegistrator* registrator);
-typedef void*(__fastcall* TEnfusionRegistratorRegisterFunction)(EnfusionRegistrator* registrator, void* a2);
+typedef void*(fastcall* TEnfusionRegistratorFunction)(EnfusionRegistrator* registrator);
+typedef void*(fastcall* TEnfusionRegistratorRegisterFunction)(EnfusionRegistrator* registrator, void* a2);
 
 
 

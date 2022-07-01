@@ -4,18 +4,19 @@
 #define INFINITYPLUGIN_H
 
 #include "enscript.h"
+#include "conventions.h"
 
 typedef void ScriptClass;
 typedef void ScriptFunction;
 
 typedef enum {LVL_INFO, LVL_WARN, LVL_ERROR, LVL_FATAL} LogLevel;
 
-typedef FunctionResult*(__fastcall* TUserScriptFunction)(FunctionContext* pCtx, FunctionResult* pResult);
+typedef FunctionResult*(fastcall* TUserScriptFunction)(FunctionContext* pCtx, FunctionResult* pResult);
 
-typedef ScriptClass*(__fastcall* TRegisterClass)(const char* className);
-typedef ScriptFunction*(__fastcall* TRegisterFunction)(ScriptClass* registeredClass, const char* functionName, TUserScriptFunction function);
+typedef ScriptClass*(fastcall* TRegisterClass)(const char* className);
+typedef ScriptFunction*(fastcall* TRegisterFunction)(ScriptClass* registeredClass, const char* functionName, TUserScriptFunction function);
 
-typedef void(__fastcall* TPrintToLogf)(LogLevel level, const char* format, ...);
+typedef void(fastcall* TPrintToLogf)(LogLevel level, const char* format, ...);
 
 typedef struct infinity_core {
     TRegisterClass RegisterClass;

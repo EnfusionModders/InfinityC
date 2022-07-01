@@ -7,6 +7,7 @@
 #include "enfusion.h"
 #include "infinityplugin.h"
 #include "logger.h"
+#include "conventions.h"
 
 // ------------------------------------------------------------
 // plugin interface
@@ -83,7 +84,7 @@ void pluginPrint(LogLevel level, const char* format, ...)
 // ------------------------------------------------------------
 // plugin loading
 
-typedef void(__fastcall* TOnPluginLoad)(InfinityCore* pCore);
+typedef void(fastcall* TOnPluginLoad)(InfinityCore* pCore);
 
 // enumerate all plugin libraries and call the function w/ library path
 void enumPluginFiles(TFileFoundCallback enumCallback)

@@ -1,7 +1,6 @@
 #include "infinity.h"
 
 #if defined(_WIN64)
-/* Windows Entrypoint */
 
 #include <Windows.h>
 #define EXPORT __declspec(dllexport)
@@ -363,10 +362,18 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     return TRUE;
 }
 
-#endif
+#else
+#include <pthread.h>
+#include <string.h>
+#include <stdio.h>
 
-#ifdef __linux__ 
-
-//TODO: linux implementation
+void __attribute__((constructor)) infinity_init() {
+    pthread_t threadId;
+    int err = pthread_create(&threadId,NULL, &InfinityMain, NULL);
+    if(err)
+    {
+        printf("Failed to create infinity thread.\n====\n%s\n===\n", strerror(err));
+    }
+}
 
 #endif

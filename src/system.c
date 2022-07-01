@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "logger.h"
 #include "patterns.h"
@@ -11,6 +12,7 @@
 #include <Windows.h>
 #include <Psapi.h>
 #else
+#include <unistd.h>
 #include <dlfcn.h>
 #include <unistd.h>
 #endif
@@ -47,9 +49,19 @@ PatternBounds GetLibraryBounds(const char* libName)
     result.first = info.lpBaseOfDll;
     result.last = (void*)((uint64_t)base + info.SizeOfImage - 1);
 #else
-    //TODO: linux implementation
+    // this uses /proc/[id]/maps to find library bounds
+    // example:
+    //
+    // 7f218737d000-7f2187380000 r--p 00000000 08:10 41081                      /usr/lib/x86_64-linux-gnu/libnss_files-2.31.so
+    // 7f2187380000-7f2187387000 r-xp 00003000 08:10 41081                      /usr/lib/x86_64-linux-gnu/libnss_files-2.31.so
+    //
+    // for "/usr/lib/x86_64-linux-gnu/libnss_files-2.31.so"
+    // 
+    // gives 7f218737d000 to 7f2187387000
+}
+
 #endif
-    return result;
+return result;
 }
 
 int LibraryExists(const char* libName)
@@ -57,7 +69,7 @@ int LibraryExists(const char* libName)
 #if defined(_WIN64)
     return (GetModuleHandleA(libName) != NULL);
 #else
-    return dlopen(libName, RTLD_LAZY | RTLD_NOLOAD);
+    return (dlopen(libName, RTLD_LAZY | RTLD_NOLOAD) != NULL);
 #endif
 }
 
@@ -83,7 +95,9 @@ int GetRelativeDirectory(const char* folderName, char* buffer, int size)
     strcpy(buffer,sDir);
     return 1;
 #else
-    char sDir[size] = { 0 };
+    char sDir[size];
+    memset(sDir, 0, size);
+    
     if(!getcwd(sDir, size)) return 0; // not large enough buffer
     
     if(strlen(sDir) + folderNamelen + 2 > size) return 0; // strcat would overflow!
@@ -160,7 +174,7 @@ void* GetExport(const char* library, const char* function)
     HMODULE hLib = LoadLibraryA(library);
     if(!hLib) return 0;
     return GetProcAddress(hLib, function);
-#elif
+#else
     void* hLib = dlopen(library, RTLD_NOW | RTLD_NODELETE);
     if(!hLib) return 0;
     return dlsym(hLib, function);

@@ -13,11 +13,13 @@
 const char* TARGET_MODULE_NAME = "ModuleGame";
 
 #if defined(_WIN64)
+//TODO: some of these patterns are far to short to be reliable long term
 const char* PATTERN_SCRIPT_TABLE_HEAD = "48 8B 1D ? ? ? ? 48 8B F2 4C 8B F1";
 const char* PATTERN_REGISTER_CLASS = "48 83 EC 38 4C 8B C2 41 B1 02";
 const char* PATTERN_REGISTER_CLASS_FUNCTION = "48 89 5C 24 ? 57 48 83 EC 30 0F B6 44 24 ? 48 8B D9";
+//TODO: this pattern is probably too long to be reliable long term
 const char* PATTERN_PRINTF_TO_LOG = "48 8B C4 4C 89 48 20 4C 89 40 18 41 54 41 56 41 57 48 81 EC ? ? ? ? 3B 0D ? ? ? ? 4D 8B F1 44 8B FA 44 8B E1 0F 82";
-#elif
+#else
 //TODO: find linux patterns
 const char* PATTERN_SCRIPT_TABLE_HEAD = "00";
 const char* PATTERN_REGISTER_CLASS = "00";

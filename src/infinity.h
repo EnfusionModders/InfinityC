@@ -4,7 +4,7 @@
 #define INFINITY_H
 
 
-void InfinityMain();
+void* InfinityMain(void* arg);
 
 
 #endif //INFINITY_H

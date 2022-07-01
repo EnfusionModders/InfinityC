@@ -20,4 +20,5 @@ windows:
 
 .PHONY: linux
 linux:
-	$(error linux builds not supported)
+	mkdir -p build
+	gcc -ldl -pthread -Wno-attributes -fPIC --shared -o build/infinityc.so -I src/ src/*.c
