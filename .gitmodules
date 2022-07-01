@@ -1,0 +1,3 @@
+[submodule "proc_maps_parser"]
+	path = proc_maps_parser
+	url = https://github.com/ouadev/proc_maps_parser
