@@ -50,8 +50,10 @@ typedef void*(fastcall* TEnfusionRegistratorFunction)(EnfusionRegistrator* regis
 typedef void*(fastcall* TEnfusionRegistratorRegisterFunction)(EnfusionRegistrator* registrator, void* a2);
 
 
-
 struct enfusion_registrator_vtable {
+#if !defined(_WIN64)
+    TEnfusionRegistratorFunction LinuxHeader;
+#endif
     TEnfusionRegistratorFunction Deconstruct;
     TEnfusionRegistratorFunction Unk0;
     TEnfusionRegistratorRegisterFunction Register;

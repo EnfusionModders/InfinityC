@@ -134,6 +134,27 @@ int GetRelativeDirectory(const char* folderName, char* buffer, int size)
 #endif
 }
 
+#if !defined(_WIN64)
+#include <stdbool.h>
+
+bool match(const char *pattern, const char *candidate, int p, int c) {
+    if (pattern[p] == '\0') {
+        return candidate[c] == '\0';
+    } else if (pattern[p] == '*') {
+        for (; candidate[c] != '\0'; c++) {
+            if (match(pattern, candidate, p+1, c))
+                return true;
+        }
+        return match(pattern, candidate, p+1, c);
+    } else if (pattern[p] != '?' && pattern[p] != candidate[c]) {
+        return false;
+    }  else {
+        return match(pattern, candidate, p+1, c+1);
+    }
+}
+#endif
+
+
 // enumerate files in directory matching the given extension filter of format '*.*'
 // filter can be NULL to default to '*.*'
 // on match, callback is run on the same thread
@@ -183,9 +204,16 @@ int EnumerateFilesInDirectory(const char* directory, const char* filter, TFileFo
     while (ep = readdir (dp))
     {
         if(strcmp(ep->d_name, ".") == 0 || strcmp(ep->d_name, "..") == 0) continue; // skip .. and . files
+        
+        char sPath[260];
+        memset(sPath, 0, 260);
+        sprintf(sPath,"%s/%s",directory, ep->d_name);
+        if(!match(filter, ep->d_name, 0, 0)) // check if pattern matches (check only filename not directory)
+            continue;
+        
         Println(LT_INFO, "found %s/%s in plugin dir",directory, ep->d_name);
+        enumCallback(sPath);
     }
-    
     closedir(dp);
     return 1;
 #endif

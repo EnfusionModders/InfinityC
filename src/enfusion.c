@@ -78,30 +78,47 @@ void* registerFunction(EnfusionRegistrator* registrator, void* a2)
     FunctionTableEntry* functionEntry = registrator->classFunctions;
     if(!functionEntry) return (void*)1; 
     
+    
+    
     if ((*(uint32_t*)((uint64_t)a2 + 24) & 0x10) == 0)
-		return (void*)1;
+        return (void*)1;
+    
+    Println(LT_INFO, "Registering class '%s'.", name);
     // register class name
     void* pContext = *(void**)((uint64_t)a2 + 16);
     registrator->scriptClass = RegisterEnfusionClass(pContext, name);
     
-    if(registrator->scriptClass)
-    {
+    if(registrator->scriptClass) {
         // register all functions in linked list
+        
         pContext = *(void**)((uint64_t)a2 + 16);
         do {
-            RegisterEnfusionClassFunction(pContext, 
-                                          registrator->scriptClass, 
-                                          functionEntry->name, 
-                                          functionEntry->function, 
-                                          0, 1);
+            Println(LT_INFO, "Registering function '%s.%s'.", name, functionEntry->name);
+            void* result = RegisterEnfusionClassFunction(pContext, 
+                                                         registrator->scriptClass, 
+                                                         functionEntry->name, 
+                                                         functionEntry->function, 
+                                                         0, 1);
+            if(!result)
+            {
+                Println(LT_WARN, "Failed to register function. Not defined in enscript?");
+            }
             
             functionEntry = functionEntry->next;
         } while(functionEntry);
         
+    } else {
+        Println(LT_WARN, "Failed to register class. Not defined in enscript?");
     }
+    
+    
     return (void*)1;
 }
+
 const EnfusionRegistratorVTable g_RegistratorVtable = {
+#if !defined(_WIN64)
+    .LinuxHeader = rtnZero,
+#endif
     .Deconstruct = destroyRegistrator,
     .Unk0 = rtnZero,
     .Register = registerFunction,
@@ -112,6 +129,7 @@ const EnfusionRegistratorVTable g_RegistratorVtable = {
     .Unk5 = rtnZero,
     .Unk6 = rtnZero,
 };
+
 // --- functions / helpers / constructors
 EnfusionRegistrator* GetLastRegistratorEntry()
 {
