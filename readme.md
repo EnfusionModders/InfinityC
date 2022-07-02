@@ -56,29 +56,30 @@ Run `make windows` to build on windows for windows targets.
 
 ### Linux
 
-You need to install [GCC](#)
+You need to install [GCC 12.1](https://tutorialforlinux.com/2022/05/25/step-by-step-gcc-12-1-ubuntu-20-04-installation-guide/)
 
-You need to install [MAKE](#)
+You need to install MAKE.
 
 Run `make linux` to build on linux for linux targets.
 
-_Note: WSL is supported for linux builds._
-
-__Linux is not yet supported.__
+_Note: WSL is supported for linux builds_
 
 ## Installing
 
-Create a `Plugins` folder in the root ArmaReforgerServer or Workbench directory.
+Create a `plugins` folder in the root ArmaReforgerServer or Workbench directory.
 
 ### Windows
 
 Drop `secur32.dll` in the root directory.
 
-Drop plugins in your `Plugins` folder.
+Drop plugins in your `plugins` folder.
 
 ### Linux
 
-Use `LD_PRELOAD` to load `infinity.so` into your reforger server.
+Use `LD_PRELOAD` to load `infinity.so` into your reforger server. This is done by adding `LD_PRELOAD` prior to the launch application in your startup script. Here is an example:
 
-__Install steps incomplete. Linux not yet supported__
+`LD_PRELOAD=/full/path/to/infinityc.so ./ArmaReforgerServer [reforger args here]`
+
+Drop plugins into your `plugins` folder.
+
 
