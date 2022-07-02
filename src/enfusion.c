@@ -13,18 +13,15 @@
 const char* TARGET_MODULE_NAME = "ModuleGame";
 
 #if defined(_WIN64)
-//TODO: some of these patterns are far to short to be reliable long term
 const char* PATTERN_SCRIPT_TABLE_HEAD = "48 8B 1D ? ? ? ? 48 8B F2 4C 8B F1";
 const char* PATTERN_REGISTER_CLASS = "48 83 EC 38 4C 8B C2 41 B1 02";
 const char* PATTERN_REGISTER_CLASS_FUNCTION = "48 89 5C 24 ? 57 48 83 EC 30 0F B6 44 24 ? 48 8B D9";
-//TODO: this pattern is probably too long to be reliable long term
-const char* PATTERN_PRINTF_TO_LOG = "48 8B C4 4C 89 48 20 4C 89 40 18 41 54 41 56 41 57 48 81 EC ? ? ? ? 3B 0D ? ? ? ? 4D 8B F1 44 8B FA 44 8B E1 0F 82";
+const char* PATTERN_PRINTF_TO_LOG = "48 8B C4 4C 89 48 20 4C 89 40 18 41 54";
 #else
-//TODO: find linux patterns
-const char* PATTERN_SCRIPT_TABLE_HEAD = "00";
-const char* PATTERN_REGISTER_CLASS = "00";
-const char* PATTERN_REGISTER_CLASS_FUNCTION = "00";
-const char* PATTERN_PRINTF_TO_LOG = "00";
+const char* PATTERN_SCRIPT_TABLE_HEAD = "48 8B 1D ? ? ? ? 40 B5 01"; // rel accessor
+const char* PATTERN_REGISTER_CLASS = "E8 ? ? ? ? 49 89 C4 4D 85 E4 74 74"; // rel call
+const char* PATTERN_REGISTER_CLASS_FUNCTION = "E9 ? ? ? ? BF ? ? ? ? 5B"; // rel call
+const char* PATTERN_PRINTF_TO_LOG = "E8 ? ? ? ? 48 81 C4 ? ? ? ? C3 0F 1F 44 00 00 53"; // rel call
 #endif
 
 // -----------------------------------------------------------------------------
@@ -255,14 +252,15 @@ int InitEnfusion()
         return 0;
     }
     
+#if defined(_WIN64)
+    // find windows patterns
     void* addr = FindPattern(searchRange, PATTERN_SCRIPT_TABLE_HEAD);
     if(!addr)
     {
         Println(LT_ERROR, "Failed to find global registrator table.");
         return 0;
     }
-    uint32_t rel = *(uint32_t*)((uint64_t)addr+3); // pattern start is offset from 3 to the rel access
-    EnfusionGlobalRegistratorTable = (void*)((uint64_t)addr + 7 + rel); // 3 offset + 4 size of int32
+    EnfusionGlobalRegistratorTable = ReadRel(addr, 3);
     
     RegisterEnfusionClass = FindPattern(searchRange, PATTERN_REGISTER_CLASS);
     if(!RegisterEnfusionClass)
@@ -284,6 +282,43 @@ int InitEnfusion()
         Println(LT_ERROR, "Failed to find log print routine.");
         return 0;
     }
+    
+#else
+    // find linux patterns
+    void* relcall = FindPattern(searchRange,PATTERN_SCRIPT_TABLE_HEAD);
+    if(!relcall)
+    {
+        Println(LT_ERROR, "Failed to find global registrator table.");
+        return 0;
+    }
+    EnfusionGlobalRegistratorTable = ReadRel(relcall, 3);
+    
+    relcall = FindPattern(searchRange, PATTERN_REGISTER_CLASS);
+    if(!relcall)
+    {
+        Println(LT_ERROR, "Failed to find register enfusion class function.");
+        return 0;
+    }
+    RegisterEnfusionClass = ReadRel(relcall, 1);
+    
+    relcall = FindPattern(searchRange, PATTERN_REGISTER_CLASS_FUNCTION);
+    if(!relcall)
+    {
+        Println(LT_ERROR, "Failed to find register enfusion class function function.");
+        return 0;
+    }
+    RegisterEnfusionClassFunction = ReadRel(relcall, 1);
+    
+    relcall = FindPattern(searchRange, PATTERN_PRINTF_TO_LOG);
+    if(!relcall)
+    {
+        Println(LT_ERROR, "Failed to find log print routine.");
+        return 0;
+    }
+    PrintToEnfusionf = ReadRel(relcall, 1);
+#endif
+    
+    Println(LT_INFO, "Enfusion initialized");
     
     return 1;
 }

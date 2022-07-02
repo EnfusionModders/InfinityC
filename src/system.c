@@ -14,7 +14,9 @@
 #else
 #include <unistd.h>
 #include <dlfcn.h>
-#include <unistd.h>
+#include <link.h>
+#include <sys/types.h>
+#include <dirent.h>
 #endif
 
 
@@ -29,6 +31,37 @@ void OSSleep(long int ms)
 }
 // get bounds of a loaded library
 // pass NULL to get bounds of main assembly
+
+
+#if !defined(_WIN64)
+static int
+on_module_enum(struct dl_phdr_info *info, size_t size, void *data)
+{
+    PatternBounds* pResults = (PatternBounds*)data;
+    if(!pResults) return 1;
+    
+    void* base = (void*)info->dlpi_addr;
+    
+    //Println(LT_INFO, "Base module relocation: %p", base);
+    
+    // find Loadable program segment (we only pattern scan this region)
+    for(int i = 0; i < info->dlpi_phnum;i++)
+    {
+        const ElfW(Phdr)* phdr = &info->dlpi_phdr[i];
+        if (phdr->p_type == PT_LOAD) { /* Loadable program segment */
+            pResults->first = (void*)((uint64_t)base + (uint64_t)phdr->p_vaddr);
+            pResults->last = (void*)((uint64_t)pResults->first + (uint64_t)phdr->p_memsz - 1); 
+            return 1;
+        }
+    }
+    
+    Println(LT_ERROR, "Failed to find loadable program segment for reforger.");
+    return 1;
+}
+
+#endif
+
+
 PatternBounds GetLibraryBounds(const char* libName)
 {
     PatternBounds result;
@@ -49,19 +82,10 @@ PatternBounds GetLibraryBounds(const char* libName)
     result.first = info.lpBaseOfDll;
     result.last = (void*)((uint64_t)base + info.SizeOfImage - 1);
 #else
-    // this uses /proc/[id]/maps to find library bounds
-    // example:
-    //
-    // 7f218737d000-7f2187380000 r--p 00000000 08:10 41081                      /usr/lib/x86_64-linux-gnu/libnss_files-2.31.so
-    // 7f2187380000-7f2187387000 r-xp 00003000 08:10 41081                      /usr/lib/x86_64-linux-gnu/libnss_files-2.31.so
-    //
-    // for "/usr/lib/x86_64-linux-gnu/libnss_files-2.31.so"
-    // 
-    // gives 7f218737d000 to 7f2187387000
-}
-
+    dl_iterate_phdr(on_module_enum, (void*)&result);
 #endif
-return result;
+    Println(LT_INFO, "Main Library Bounds: %p-%p",result.first, result.last);
+    return result;
 }
 
 int LibraryExists(const char* libName)
@@ -102,7 +126,7 @@ int GetRelativeDirectory(const char* folderName, char* buffer, int size)
     
     if(strlen(sDir) + folderNamelen + 2 > size) return 0; // strcat would overflow!
     
-    strcat(sDir, "//");
+    strcat(sDir, "/"); 
     strcat(sDir, folderName);
     
     strcpy(buffer, sDir);
@@ -153,8 +177,17 @@ int EnumerateFilesInDirectory(const char* directory, const char* filter, TFileFo
     
     return 1;
 #else
+    DIR* dp = opendir(directory);
+    struct dirent *ep;
     
-    return 0;
+    while (ep = readdir (dp))
+    {
+        if(strcmp(ep->d_name, ".") == 0 || strcmp(ep->d_name, "..") == 0) continue; // skip .. and . files
+        Println(LT_INFO, "found %s/%s in plugin dir",directory, ep->d_name);
+    }
+    
+    closedir(dp);
+    return 1;
 #endif
 }
 

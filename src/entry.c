@@ -366,9 +366,17 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 #include <pthread.h>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <stdlib.h>
 
-void __attribute__((constructor)) infinity_init() {
+int LINUX_LOADED = 0;
+
+void __attribute__((visibility ("default"))) __attribute__((constructor)) infinity_init() {
+    unsetenv("LD_PRELOAD"); // don't load into child processes
+    
     pthread_t threadId;
+    printf("\n\n\ncreating infinity thread. %d\n\n\n", getpid());
     int err = pthread_create(&threadId,NULL, &InfinityMain, NULL);
     if(err)
     {

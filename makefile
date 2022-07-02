@@ -20,11 +20,5 @@ windows:
 
 .PHONY: linux
 linux:
-	# first we must build proc_maps_parser
-	cd proc_maps_parser && \
-	mkdir -p build && \
-	gcc pmparser.c -I include/ -c -o build/pmparser.o && \
-	ar rcs build/libpmparser.a build/pmparser.o
-	# now we can build our library
 	mkdir -p build
-	gcc -ldl -pthread -Wno-attributes -fPIC --shared -o build/infinityc.so -I src/ src/*.c
+	gcc -D_GNU_SOURCE -ldl -pthread -Wno-attributes -fPIC -fvisibility=hidden --shared -o build/infinityc.so -I proc_maps_parser/include/ -I src/ src/*.c

@@ -2,11 +2,23 @@
 #include "patterns.h"
 
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "logger.h"
 
 void* searchByMask(PatternBounds bounds, const unsigned char* search, const char* mask);
 int patternToSearchMask(const char* pattern, unsigned char* searchOut, char* maskOut);
+
+
+void* ReadRel(void* op_start, int op_prefix) 
+{
+    if(!op_start) return 0;
+    
+    void* read_at = (void*)((uint64_t)op_start + op_prefix); // jump past our prefix (mov/call opcode)
+    int32_t rel = *(int32_t*)read_at; // read 4 byte rel value (rel can be negative!)
+    void* dest = (void*)((uint64_t)op_start + 4 + op_prefix + rel); // rel is based on the next instruction
+    return dest;
+}
 
 // find a pattern of format "01 A2 48 F3 ? A2"
 void* FindPattern(PatternBounds bounds, const char* pattern)

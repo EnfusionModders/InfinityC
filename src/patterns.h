@@ -10,6 +10,7 @@ typedef struct module_bounds {
 } PatternBounds;
 
 
+void* ReadRel(void* op_start, int op_prefix);// read a relative opcode
 void* FindPattern(PatternBounds bounds, const char* pattern);
 
 #endif //PATTERNS_H
