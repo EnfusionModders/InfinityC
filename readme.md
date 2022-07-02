@@ -48,7 +48,7 @@ I have included a `makefile` with all the necessary commands to build on each pl
 
 You need to install [MinGW-w64](https://www.mingw-w64.org/downloads/) to build.
 
-You need to install [make](#) to run the make commands.
+You need to install `make` to run the make commands.
 
 I recommend installing [Msys2](https://www.msys2.org/) which can provide both of the binaries above.
 
