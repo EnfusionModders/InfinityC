@@ -21,4 +21,4 @@ windows:
 .PHONY: linux
 linux:
 	mkdir -p build
-	gcc -D_GNU_SOURCE -ldl -pthread -Wno-attributes -fPIC -fvisibility=hidden --shared -o build/infinityc.so -I proc_maps_parser/include/ -I src/ src/*.c
+	gcc -D_GNU_SOURCE -ldl -pthread -Wno-attributes -fPIC -fvisibility=hidden --shared -o build/infinityc.so -I src/ src/*.c
