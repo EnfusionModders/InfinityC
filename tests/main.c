@@ -3,8 +3,10 @@
 
 #include <stdio.h>
 
-int main(intc argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     printf("Testing InfinityC...\n");
+    fflush(stdout);
+    
     int failures = 0;
     _verify(test_system, failures);
     

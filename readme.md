@@ -44,23 +44,19 @@ EXPORT void OnPluginLoad(InfinityCore* pCore)
 
 I have included a `makefile` with all the necessary commands to build on each platform.
 
-### Windows
+Run: `make build`
 
-You need to install [MinGW-w64](https://www.mingw-w64.org/downloads/) to build.
+### Windows Prereqs
 
+You need to install [MinGW-w64](https://www.mingw-w64.org/downloads/) to build. 
 You need to install `make` to run the make commands.
 
 I recommend installing [Msys2](https://www.msys2.org/) which can provide both of the binaries above.
 
-Run `make windows` to build on windows for windows targets.
-
-### Linux
+### Linux Prereqs
 
 You need to install [GCC 12.1](https://tutorialforlinux.com/2022/05/25/step-by-step-gcc-12-1-ubuntu-20-04-installation-guide/)
-
 You need to install MAKE.
-
-Run `make linux` to build on linux for linux targets.
 
 _Note: WSL is supported for linux builds_
 
@@ -71,7 +67,6 @@ Create a `plugins` folder in the root ArmaReforgerServer or Workbench directory.
 ### Windows
 
 Drop `secur32.dll` in the root directory.
-
 Drop plugins in your `plugins` folder.
 
 ### Linux
@@ -83,3 +78,8 @@ Use `LD_PRELOAD` to load `infinity.so` into your reforger server. This is done b
 Drop plugins into your `plugins` folder.
 
 
+## Unit Tests
+
+There is some issue with GCC tests on windows. The test only works from inside a bash command prompt. This isn't a problem when running tests from the make command. 
+
+Run: `make test`

@@ -32,7 +32,13 @@ endif
 test:
 ifeq ($(OS), Windows_NT)
 	@echo "Testing InfinityC for Windows"
+	mkdir -p build
+	gcc -D_WIN64 -Wl,-subsystem,windows -o build/test.exe -I src/ -I tests/ tests/*c src/*c
+	build/test.exe
 else
 	@echo "Testing InfinityC for Linux"
+	mkdir -p build
+	gcc -D_GNU_SOURCE -ldl -pthread -Wno-attributes -fPIC -fvisibility=hidden -e main -o build/test -I tests/ -I src/ tests/*.c src/*.c
+	build/test
 endif 
 
