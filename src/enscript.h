@@ -3,9 +3,6 @@
 #ifndef ENSCRIPT_H
 #define ENSCRIPT_H
 
-#include <stdlib.h>
-
-
 typedef struct script_native_holder {
     void* pValue;
 } NativeValueHolder;
@@ -61,7 +58,7 @@ static inline NativeValueHolder* GetArgumentHolder(FunctionContext* pCtx, unsign
 static inline void* GetArgument(FunctionContext* pCtx, unsigned int index) {
     NativeValueHolder* native = GetArgumentHolder(pCtx, index);
     if(!native) return 0;
-    return native->pValue;
+    return native->pValue;// this may not work without size information, may need to follow the WriteNativeValue style...
 }
 // this function is not working :(
 static inline void SetArgument(FunctionContext* pCtx, unsigned int index, void* pData, unsigned int size)

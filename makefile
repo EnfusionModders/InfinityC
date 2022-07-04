@@ -4,21 +4,35 @@
 #	Windows requires 'make' and 'gcc'.	
 #
 
-# variables
-
-.PHONY: push
-push:
-	git add .
-	git commit -m "new work done :)"
-	git push
 
 
-.PHONY: windows
-windows:
+.PHONY: build
+build:
+ifeq ($(OS), Windows_NT)
+	@echo "Building InfinityC for Windows"
 	mkdir -p build
 	gcc -D_WIN64 -Wl,-subsystem,windows --shared -o build/secur32.dll -I src/ src/*.c
-
-.PHONY: linux
-linux:
+else
+	@ehco "Building InfinityC for Linux"
 	mkdir -p build
 	gcc -D_GNU_SOURCE -ldl -pthread -Wno-attributes -fPIC -fvisibility=hidden --shared -o build/infinityc.so -I src/ src/*.c
+endif
+
+.PHONY: clean
+clean:
+ifeq ($(OS), Windows_NT)
+	@echo "Cleaning InfinityC for Windows"
+	powershell.exe -c 'Remove-Item -Recurse -Confirm:$$false build'
+else
+	@echo "Cleaning InfinityC for Linux"
+	rm -rf ./build
+endif 
+
+.PHONY: test
+test:
+ifeq ($(OS), Windows_NT)
+	@echo "Testing InfinityC for Windows"
+else
+	@echo "Testing InfinityC for Linux"
+endif 
+

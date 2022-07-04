@@ -51,5 +51,5 @@ command_list = {
 };
 
 fkey_command[1] = "build";
-fkey_command[2] = "push";
+fkey_command[2] = "test";
 fkey_command[3] = "clean";
