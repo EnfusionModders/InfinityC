@@ -26,8 +26,8 @@ command_list = {
 		.out = "*building*",
 		.footer_panel = true, .save_dirty_files = false, .cursor_at_end = true,
 		.cmd = {
-          {"make windows", .os = "win"},
-          {"make linux", .os = "linux"},
+          {"make build", .os = "win"},
+          {"make build", .os = "linux"},
 		},
 	},
 	{
@@ -35,17 +35,17 @@ command_list = {
 		.out = "*cleaning*",
 		.footer_panel = true, .save_dirty_files = false, .cursor_at_end = true,
 		.cmd = {
-			{"make windows", .os = "win"},
-			{"make linux", .os = "linux"},
+			{"make clean", .os = "win"},
+			{"make clean", .os = "linux"},
 		},
 	},
 	{
-		.name = "push",
-		.out = "*pushing*",
+		.name = "test",
+		.out = "*testing*",
 		.footer_panel = true, .save_dirty_files = false, .cursor_at_end = true,
 		.cmd = {
-			{"make push", .os = "win"},
-			{"make push", .os = "linux"},
+			{"make test", .os = "win"},
+			{"make test", .os = "linux"},
 		},
 	}
 };
